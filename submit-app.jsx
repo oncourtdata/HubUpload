@@ -239,7 +239,8 @@ function PreviewCard({ draft }) {
   return React.createElement('div', {
     style: {
       background: 'var(--graphite-800)', borderRadius: 'var(--radius-md)', padding: 'var(--space-6)',
-      border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)'
+      border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)',
+      minHeight: 260
     }
   },
     React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 } },
@@ -251,7 +252,7 @@ function PreviewCard({ draft }) {
       }, fmt.label)
     ),
     React.createElement('h3', {
-      style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h4)', lineHeight: 'var(--leading-snug)', color: 'var(--text-on-ink)', letterSpacing: 'var(--tracking-tight)', margin: 0 }
+      style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h4)', lineHeight: 'var(--leading-snug)', color: 'var(--text-on-ink)', letterSpacing: 'var(--tracking-tight)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
     }, draft.title || 'Your title will appear here'),
     draft.summary ? React.createElement('p', {
       style: { fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--leading-body)', color: 'var(--graphite-400)', margin: 0 }
@@ -266,9 +267,9 @@ function PreviewCard({ draft }) {
     },
       /* Publisher logo or name */
       (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl)
-        ? React.createElement('img', { src: draft.publisherLogoUrl, alt: draft.publisherName || 'Publisher', style: { height: 16, maxWidth: 56, objectFit: 'contain', borderRadius: 2, flexShrink: 0 } })
+        ? React.createElement('img', { src: draft.publisherLogoUrl, alt: draft.publisherName || 'Publisher', style: { height: 32, maxWidth: 36, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
         : (draft.publisherLogoMode === 'file' && draft.publisherLogoFile)
-        ? React.createElement('img', { src: URL.createObjectURL(draft.publisherLogoFile), alt: draft.publisherName || 'Publisher', style: { height: 16, maxWidth: 56, objectFit: 'contain', borderRadius: 2, flexShrink: 0 } })
+        ? React.createElement('img', { src: URL.createObjectURL(draft.publisherLogoFile), alt: draft.publisherName || 'Publisher', style: { height: 32, maxWidth: 36, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
         : draft.publisherName
         ? React.createElement('span', null, draft.publisherName)
         : null,
