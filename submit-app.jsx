@@ -264,8 +264,19 @@ function PreviewCard({ draft }) {
     React.createElement('div', {
       style: { display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-caption)', color: 'var(--graphite-400)', marginTop: 4 }
     },
+      /* Publisher logo or name */
+      (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl)
+        ? React.createElement('img', { src: draft.publisherLogoUrl, alt: draft.publisherName || 'Publisher', style: { height: 16, maxWidth: 56, objectFit: 'contain', borderRadius: 2, flexShrink: 0 } })
+        : (draft.publisherLogoMode === 'file' && draft.publisherLogoFile)
+        ? React.createElement('img', { src: URL.createObjectURL(draft.publisherLogoFile), alt: draft.publisherName || 'Publisher', style: { height: 16, maxWidth: 56, objectFit: 'contain', borderRadius: 2, flexShrink: 0 } })
+        : draft.publisherName
+        ? React.createElement('span', null, draft.publisherName)
+        : null,
+      (draft.publisherName || (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl) || (draft.publisherLogoMode === 'file' && draft.publisherLogoFile))
+        ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)', flexShrink: 0 } })
+        : null,
       React.createElement('span', null, draft.date || RD.formatMonth(Date.now())),
-      draft.meta ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)' } }) : null,
+      draft.meta ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)', flexShrink: 0 } }) : null,
       draft.meta ? React.createElement('span', null, draft.meta) : null,
       React.createElement('span', {
         style: { marginLeft: 'auto', fontFamily: 'var(--font-label)', fontWeight: 'var(--weight-medium)', fontSize: '0.6875rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--flame-400)' }
@@ -357,7 +368,11 @@ const BLANK = {
   meta: '',
   date: '',
   summary: '',
-  url: ''
+  url: '',
+  publisherName: '',
+  publisherLogoMode: 'none',  // 'none' | 'url' | 'file'
+  publisherLogoUrl: '',
+  publisherLogoFile: null
 };
 
 function Console({ onLock }) {
@@ -408,7 +423,9 @@ function Console({ onLock }) {
         meta: draft.meta,
         date: draft.date || RD.formatMonth(Date.now()),
         summary: draft.summary,
-        url: draft.sourceMode === 'url' ? draft.url : ''
+        url: draft.sourceMode === 'url' ? draft.url : '',
+        publisherName: draft.publisherName,
+        publisherLogo: draft.publisherLogoMode === 'url' ? draft.publisherLogoUrl : null
       };
       if (draft.sourceMode === 'file' && file) {
         try {
@@ -416,6 +433,13 @@ function Console({ onLock }) {
           fields.fileName = file.name;
         } catch (err) {
           setToast('Could not read that file.'); setBusy(false); return;
+        }
+      }
+      if (draft.publisherLogoMode === 'file' && draft.publisherLogoFile) {
+        try {
+          fields.publisherLogo = await RD.fileToDataURL(draft.publisherLogoFile);
+        } catch (err) {
+          setToast('Could not read the publisher logo.'); setBusy(false); return;
         }
       }
       const item = RD.makeItem(fields);
@@ -428,6 +452,7 @@ function Console({ onLock }) {
       setToast('Published to the Research Hub ✓');
       setDraft({ ...BLANK, format: draft.format, sourceMode: draft.sourceMode, category: draft.category });
       setFile(null);
+      set({ publisherLogoFile: null });
       setErrors({});
     } finally {
       setBusy(false);
@@ -601,6 +626,51 @@ function Console({ onLock }) {
               className: 'oc-field', placeholder: 'One or two sentences shown on the card.',
               value: draft.summary, onChange: (e) => set({ summary: e.target.value })
             })
+          ),
+
+          /* Publisher */
+          React.createElement('div', { style: cs.fieldGroup },
+            React.createElement('label', { style: cs.label }, 'Publisher ', React.createElement('span', { style: { textTransform: 'none', letterSpacing: 0, color: 'var(--text-tertiary)', fontWeight: 'var(--weight-regular)' } }, '· optional')),
+            React.createElement('input', {
+              type: 'text', className: 'oc-field', placeholder: 'e.g. Aspetar, BJSM, FIFA Medical',
+              value: draft.publisherName, onChange: (e) => set({ publisherName: e.target.value }),
+              style: { marginBottom: 'var(--space-3)' }
+            }),
+            React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-2)' } },
+              React.createElement('span', { style: { ...cs.label, marginBottom: 0 } }, 'Publisher logo'),
+              React.createElement('div', { style: { display: 'inline-flex', background: 'var(--surface-sunken)', borderRadius: 'var(--radius-pill)', padding: 3, gap: 2 } },
+                ['none', 'url', 'file'].map((m) =>
+                  React.createElement('button', {
+                    key: m, type: 'button', onClick: () => set({ publisherLogoMode: m }),
+                    style: {
+                      fontFamily: 'var(--font-label)', fontWeight: 'var(--weight-medium)', fontSize: '0.6875rem', letterSpacing: '0.06em', textTransform: 'uppercase',
+                      padding: '6px 12px', borderRadius: 'var(--radius-pill)', border: 'none', cursor: 'pointer',
+                      background: draft.publisherLogoMode === m ? 'var(--surface-card)' : 'transparent',
+                      color: draft.publisherLogoMode === m ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                      boxShadow: draft.publisherLogoMode === m ? 'var(--shadow-xs)' : 'none',
+                      transition: 'all var(--dur-fast) var(--ease-standard)'
+                    }
+                  }, m === 'none' ? 'None' : m === 'url' ? 'Link' : 'Upload')
+                )
+              )
+            ),
+            draft.publisherLogoMode === 'url'
+              ? React.createElement('input', {
+                  type: 'url', className: 'oc-field', placeholder: 'https://…/logo.png',
+                  value: draft.publisherLogoUrl, onChange: (e) => set({ publisherLogoUrl: e.target.value })
+                })
+              : draft.publisherLogoMode === 'file'
+              ? React.createElement('div', null,
+                  React.createElement('input', {
+                    type: 'file', accept: 'image/*', className: 'oc-field',
+                    onChange: (e) => set({ publisherLogoFile: e.target.files[0] || null }),
+                    style: { cursor: 'pointer' }
+                  }),
+                  draft.publisherLogoFile
+                    ? React.createElement('p', { style: cs.hint }, draft.publisherLogoFile.name)
+                    : null
+                )
+              : null
           ),
 
           /* Submit */

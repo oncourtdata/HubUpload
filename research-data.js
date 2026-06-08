@@ -99,6 +99,8 @@
       meta: (fields.meta || '').trim(),                // e.g. "12 min read" / "8:40"
       summary: (fields.summary || '').trim(),
       date: fields.date || formatMonth(now),           // human label e.g. "Jun 2026"
+      publisherName: (fields.publisherName || '').trim(),
+      publisherLogo: fields.publisherLogo || null,     // data: URL or external URL
       // Source of the actual material — exactly one of these is populated:
       fileData: fields.fileData || null,               // data: URL (base64) for uploaded files
       fileName: fields.fileName || null,
