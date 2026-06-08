@@ -63,7 +63,16 @@
   <!-- DS bundle -->
   <script src="ds/_ds_bundle.js"></script>
 
-  <!-- Shared data layer -->
+  <!-- Supabase client + config (must load before research-data.js) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script>
+    window.ONCOURT_SUPABASE = {
+      url: 'https://knywxgkmlskmktrwszuj.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtueXd4Z2ttbHNrbWt0cndzenVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MzczODIsImV4cCI6MjA5NjUxMzM4Mn0.tkrwCpxT22yfy5mdToJEBPvtiNpApEUT34JjpNa2GAQ'
+    };
+  </script>
+
+  <!-- Shared data layer (Supabase-backed) -->
   <script src="research-data.js"></script>
 
   <!-- App -->
