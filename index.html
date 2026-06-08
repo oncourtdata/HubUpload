@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>OnCourt — Research Console</title>
+
+  <!-- Design System tokens -->
+  <link rel="stylesheet" href="ds/tokens/fonts.css">
+  <link rel="stylesheet" href="ds/tokens/colors.css">
+  <link rel="stylesheet" href="ds/tokens/typography.css">
+  <link rel="stylesheet" href="ds/tokens/spacing.css">
+  <link rel="stylesheet" href="ds/tokens/base.css">
+  <link rel="stylesheet" href="ds/styles.css">
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: var(--surface-page); }
+    ::selection { background: var(--flame-200); color: var(--graphite-900); }
+
+    /* Form primitives, styled against OnCourt tokens */
+    .oc-field {
+      font-family: var(--font-sans);
+      font-size: var(--fs-body);
+      color: var(--text-primary);
+      background: var(--surface-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      width: 100%;
+      transition: border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
+      outline: none;
+    }
+    .oc-field::placeholder { color: var(--text-tertiary); }
+    .oc-field:focus {
+      border-color: var(--flame-500);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+    textarea.oc-field { resize: vertical; min-height: 84px; line-height: var(--leading-body); }
+    select.oc-field { appearance: none; -webkit-appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2382828D' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+    }
+  </style>
+</head>
+<body>
+  <template id="__bundler_thumbnail">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" fill="#1B1B20"/>
+      <rect x="30" y="44" width="40" height="30" rx="4" fill="none" stroke="#F05329" stroke-width="3.5"/>
+      <path d="M38 44 v-6 a12 12 0 0 1 24 0 v6" fill="none" stroke="#F05329" stroke-width="3.5"/>
+      <circle cx="50" cy="57" r="3.5" fill="#F05329"/>
+    </svg>
+  </template>
+  <div id="root"></div>
+
+  <!-- React -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <!-- DS bundle -->
+  <script src="ds/_ds_bundle.js"></script>
+
+  <!-- Shared data layer -->
+  <script src="research-data.js"></script>
+
+  <!-- App -->
+  <script type="text/babel" src="submit-app.jsx"></script>
+
+  <!-- Mount -->
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(window.ResearchConsole));
+  </script>
+</body>
+</html>

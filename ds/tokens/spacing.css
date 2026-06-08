@@ -1,0 +1,50 @@
+/* ===========================================================================
+   OnCourt — Spacing, Radius, Elevation, Motion
+   An 8px base grid. Soft but architectural radii. Shadows are low, wide and
+   warm — never heavy. Motion is calm and precise (no bounce).
+   =========================================================================== */
+
+:root {
+  /* ---- Spacing (8px base) ------------------------------------------------ */
+  --space-0:  0;
+  --space-1:  0.25rem;   /* 4  */
+  --space-2:  0.5rem;    /* 8  */
+  --space-3:  0.75rem;   /* 12 */
+  --space-4:  1rem;      /* 16 */
+  --space-5:  1.5rem;    /* 24 */
+  --space-6:  2rem;      /* 32 */
+  --space-7:  3rem;      /* 48 */
+  --space-8:  4rem;      /* 64 */
+  --space-9:  6rem;      /* 96 */
+  --space-10: 8rem;      /* 128 */
+
+  /* ---- Layout ------------------------------------------------------------ */
+  --container-max: 1200px; /* @kind spacing */
+  --container-wide: 1360px; /* @kind spacing */
+  --gutter: clamp(1.25rem, 4vw, 3rem); /* @kind spacing */
+
+  /* ---- Radius ------------------------------------------------------------ */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   28px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* ---- Elevation (warm, low, diffuse) ------------------------------------ */
+  --shadow-xs: 0 1px 2px rgba(48, 48, 54, 0.06);
+  --shadow-sm: 0 2px 8px rgba(48, 48, 54, 0.06), 0 1px 2px rgba(48, 48, 54, 0.04);
+  --shadow-md: 0 8px 24px rgba(48, 48, 54, 0.08), 0 2px 6px rgba(48, 48, 54, 0.05);
+  --shadow-lg: 0 20px 48px rgba(48, 48, 54, 0.12), 0 4px 12px rgba(48, 48, 54, 0.06);
+  --shadow-flame: 0 12px 32px rgba(240, 83, 41, 0.28);
+
+  /* ---- Motion ------------------------------------------------------------ */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --dur-fast:   140ms; /* @kind other */
+  --dur-base:   240ms; /* @kind other */
+  --dur-slow:   420ms; /* @kind other */
+  --dur-slower: 720ms; /* @kind other */
+}

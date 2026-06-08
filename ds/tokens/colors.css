@@ -1,0 +1,78 @@
+/* ===========================================================================
+   OnCourt — Color
+   A premium light-mode system. Warm bone paper, deep graphite ink, and a
+   single decisive flame accent. Secondaries (sky, lime) are reserved for
+   data visualization — never for chrome or CTAs.
+   =========================================================================== */
+
+:root {
+  /* ---- Brand primitives -------------------------------------------------- */
+  --flame-50:  #FEF0EB;
+  --flame-100: #FCDACE;
+  --flame-200: #FAB59C;
+  --flame-300: #F78F6A;
+  --flame-400: #F47049;
+  --flame-500: #F05329;   /* OnCourt Flame — the primary accent */
+  --flame-600: #D8421B;
+  --flame-700: #AE3315;
+  --flame-800: #842712;
+
+  /* Graphite — built around the brand ink #303036 */
+  --graphite-900: #1B1B20;
+  --graphite-800: #242429;
+  --graphite-700: #303036;   /* OnCourt Ink — primary text & marks */
+  --graphite-600: #45454D;
+  --graphite-500: #5E5E68;
+  --graphite-400: #82828D;
+  --graphite-300: #A8A8B0;
+  --graphite-200: #CECED3;
+  --graphite-100: #E4E3E0;
+
+  /* Bone — warm off-white paper #F3F0EC */
+  --bone-50:  #FFFFFF;
+  --bone-100: #FBFAF8;
+  --bone-200: #F3F0EC;   /* OnCourt Bone — default page surface */
+  --bone-300: #EBE7E0;
+  --bone-400: #E0DBD2;
+
+  /* ---- Secondary / data palette ----------------------------------------- */
+  --sky-500:  #6290C8;   /* analytical blue */
+  --sky-300:  #9CBBDF;
+  --sky-100:  #DCE7F3;
+  --lime-500: #BDD260;   /* progression green */
+  --lime-300: #D4E198;
+  --lime-100: #EEF3D6;
+
+  /* Functional status (tuned to sit beside the brand, not fight it) */
+  --positive: #5BA672;
+  --caution:  #E0A33C;
+  --critical: #D8421B;
+
+  /* ---- Semantic surface aliases ----------------------------------------- */
+  --surface-page:      var(--bone-200);
+  --surface-raised:    var(--bone-100);
+  --surface-card:      var(--bone-50);
+  --surface-sunken:    var(--bone-300);
+  --surface-inverse:   var(--graphite-700);
+  --surface-inverse-2: var(--graphite-900);
+
+  /* ---- Semantic text aliases -------------------------------------------- */
+  --text-primary:    var(--graphite-700);
+  --text-secondary:  var(--graphite-500);
+  --text-tertiary:   var(--graphite-400);
+  --text-on-flame:   #FFFFFF;
+  --text-on-ink:     var(--bone-200);
+  --text-accent:     var(--flame-500);
+
+  /* ---- Lines & borders --------------------------------------------------- */
+  --border-subtle:  var(--graphite-100);
+  --border-default: var(--graphite-200);
+  --border-strong:  var(--graphite-300);
+  --border-inverse: rgba(255, 255, 255, 0.14);
+
+  /* ---- Interactive ------------------------------------------------------- */
+  --accent:          var(--flame-500);
+  --accent-hover:    var(--flame-600);
+  --accent-press:    var(--flame-700);
+  --focus-ring:      rgba(240, 83, 41, 0.32);
+}
