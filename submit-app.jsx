@@ -252,7 +252,7 @@ function PreviewCard({ draft }) {
       }, fmt.label)
     ),
     React.createElement('h3', {
-      style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h4)', lineHeight: 'var(--leading-snug)', color: 'var(--text-on-ink)', letterSpacing: 'var(--tracking-tight)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+      style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h4)', lineHeight: 'var(--leading-snug)', color: 'var(--text-on-ink)', letterSpacing: 'var(--tracking-tight)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', minWidth: 0 }
     }, draft.title || 'Your title will appear here'),
     draft.summary ? React.createElement('p', {
       style: { fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--leading-body)', color: 'var(--graphite-400)', margin: 0 }
@@ -265,20 +265,20 @@ function PreviewCard({ draft }) {
     React.createElement('div', {
       style: { display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-caption)', color: 'var(--graphite-400)', marginTop: 4 }
     },
-      /* Publisher logo or name */
-      (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl)
-        ? React.createElement('img', { src: draft.publisherLogoUrl, alt: draft.publisherName || 'Publisher', style: { height: 32, maxWidth: 36, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
-        : (draft.publisherLogoMode === 'file' && draft.publisherLogoFile)
-        ? React.createElement('img', { src: URL.createObjectURL(draft.publisherLogoFile), alt: draft.publisherName || 'Publisher', style: { height: 32, maxWidth: 36, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
-        : draft.publisherName
-        ? React.createElement('span', null, draft.publisherName)
-        : null,
-      (draft.publisherName || (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl) || (draft.publisherLogoMode === 'file' && draft.publisherLogoFile))
-        ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)', flexShrink: 0 } })
-        : null,
       React.createElement('span', null, draft.date || RD.formatMonth(Date.now())),
       draft.meta ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)', flexShrink: 0 } }) : null,
       draft.meta ? React.createElement('span', null, draft.meta) : null,
+      (draft.publisherName || (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl) || (draft.publisherLogoMode === 'file' && draft.publisherLogoFile))
+        ? React.createElement('span', { style: { width: 3, height: 3, borderRadius: '50%', background: 'var(--graphite-500)', flexShrink: 0 } })
+        : null,
+      /* Publisher logo or name */
+      (draft.publisherLogoMode === 'url' && draft.publisherLogoUrl)
+        ? React.createElement('img', { src: draft.publisherLogoUrl, alt: draft.publisherName || 'Publisher', style: { height: 40, maxWidth: 64, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
+        : (draft.publisherLogoMode === 'file' && draft.publisherLogoFile)
+        ? React.createElement('img', { src: URL.createObjectURL(draft.publisherLogoFile), alt: draft.publisherName || 'Publisher', style: { height: 40, maxWidth: 64, objectFit: 'contain', borderRadius: 4, flexShrink: 0 } })
+        : draft.publisherName
+        ? React.createElement('span', null, draft.publisherName)
+        : null,
       React.createElement('span', {
         style: { marginLeft: 'auto', fontFamily: 'var(--font-label)', fontWeight: 'var(--weight-medium)', fontSize: '0.6875rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--flame-400)' }
       }, fmt.verb + ' →')
