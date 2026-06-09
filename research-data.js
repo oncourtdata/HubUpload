@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  /* ── The 8 publishable categories (the hub adds "All" itself for filtering). */
+  /* ── The 10 publishable categories (the hub adds "All" itself for filtering). */
   var CATEGORIES = [
     'Sports Science',
     'Youth Development',
@@ -20,7 +20,9 @@
     'Recovery',
     'Nutrition',
     'Performance Analytics',
-    'Psychology & Cognitive Abilities',
+    'Cognitive Abilities',
+    'Sports Psychology',
+    'Neuroscience',
     'Technical Proficiency'
   ];
 
