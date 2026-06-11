@@ -162,6 +162,53 @@
     });
   }
 
+  /* update(id, fields) → Promise<Item> — patch an existing row. */
+  function update(id, fields) {
+    if (!sb) return Promise.reject(new Error('Supabase not configured'));
+
+    var chain = Promise.resolve(fields);
+
+    chain = chain.then(function (f) {
+      if (f.fileData && f.fileData.indexOf('data:') === 0) {
+        return _uploadDataURL(f.fileData, f.fileName).then(function (url) {
+          f.fileData = url; return f;
+        });
+      }
+      return f;
+    });
+    chain = chain.then(function (f) {
+      if (f.publisherLogo && f.publisherLogo.indexOf('data:') === 0) {
+        return _uploadDataURL(f.publisherLogo, 'logo.png').then(function (url) {
+          f.publisherLogo = url; return f;
+        });
+      }
+      return f;
+    });
+
+    return chain.then(function (f) {
+      var row = {
+        title: f.title,
+        category: f.category,
+        type_label: f.typeLabel,
+        format: f.format,
+        tags: f.tags || [],
+        meta: f.meta,
+        summary: f.summary,
+        date: f.date,
+        publisher_name: f.publisherName || '',
+        publisher_logo: f.publisherLogo || null,
+        file_data: f.fileData || null,
+        file_name: f.fileName || null,
+        url: f.url || null
+      };
+      return sb.from(TABLE).update(row).eq('id', id).select().single().then(function (res) {
+        if (res.error) throw res.error;
+        _notify();
+        return fromRow(res.data);
+      });
+    });
+  }
+
   /* ──────────────────────────────────────────────────────────────────────────
      END STORAGE DRIVER. Everything below is storage-agnostic.
      ────────────────────────────────────────────────────────────────────────── */
@@ -242,6 +289,7 @@
     getAll: getAll,
     add: add,
     remove: remove,
+    update: update,
     makeItem: makeItem,
     resolveAction: resolveAction,
     subscribe: subscribe,

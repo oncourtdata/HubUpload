@@ -287,14 +287,22 @@ function PreviewCard({ draft }) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   PUBLISHED LIST (manage / delete)
+   PUBLISHED LIST (manage / edit / delete)
    ════════════════════════════════════════════════════════════════ */
-function PublishedList({ items, onDelete }) {
+function PublishedList({ items, onDelete, onEdit, editingId }) {
   if (!items.length) {
     return React.createElement('p', {
       style: { fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-body-sm)', color: 'var(--text-tertiary)', padding: 'var(--space-4) 0' }
     }, 'Nothing published yet. Your first submission will appear here and on the hub.');
   }
+  const iconBtn = (active) => ({
+    border: '1px solid var(--border-default)', background: active ? 'rgba(240,83,41,0.1)' : 'var(--surface-card)',
+    color: active ? 'var(--flame-400)' : 'var(--text-tertiary)',
+    borderColor: active ? 'var(--flame-500)' : 'var(--border-default)',
+    borderRadius: 'var(--radius-sm)', width: 32, height: 32,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', flexShrink: 0, transition: 'all var(--dur-fast) var(--ease-standard)'
+  });
   return React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
     items.map((it) =>
       React.createElement('div', {
@@ -302,7 +310,8 @@ function PublishedList({ items, onDelete }) {
         style: {
           display: 'flex', alignItems: 'center', gap: 'var(--space-3)',
           padding: '12px 14px', background: 'var(--surface-card)',
-          border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)'
+          border: editingId === it.id ? '1px solid var(--flame-500)' : '1px solid var(--border-subtle)',
+          borderRadius: 'var(--radius-sm)'
         }
       },
         React.createElement('div', { style: { minWidth: 0, flex: 1 } },
@@ -313,11 +322,26 @@ function PublishedList({ items, onDelete }) {
             style: { fontFamily: 'var(--font-label)', fontSize: '0.6875rem', letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-tertiary)', margin: '3px 0 0' }
           }, it.format + '  ·  ' + it.category + '  ·  ' + it.date)
         ),
+        /* Edit button */
+        React.createElement('button', {
+          type: 'button',
+          onClick: () => onEdit(it),
+          title: 'Edit this item',
+          style: iconBtn(editingId === it.id),
+          onMouseEnter: (e) => { if (editingId !== it.id) { e.currentTarget.style.borderColor = 'var(--flame-500)'; e.currentTarget.style.color = 'var(--flame-400)'; } },
+          onMouseLeave: (e) => { if (editingId !== it.id) { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-tertiary)'; } }
+        },
+          React.createElement('svg', { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+            React.createElement('path', { d: 'M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7' }),
+            React.createElement('path', { d: 'M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z' })
+          )
+        ),
+        /* Delete button */
         React.createElement('button', {
           type: 'button',
           onClick: () => onDelete(it.id),
           title: 'Remove from hub',
-          style: { border: '1px solid var(--border-default)', background: 'var(--surface-card)', color: 'var(--text-tertiary)', borderRadius: 'var(--radius-sm)', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all var(--dur-fast) var(--ease-standard)' },
+          style: iconBtn(false),
           onMouseEnter: (e) => { e.currentTarget.style.borderColor = 'var(--critical)'; e.currentTarget.style.color = 'var(--critical)'; },
           onMouseLeave: (e) => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-tertiary)'; }
         },
@@ -384,6 +408,8 @@ function Console({ onLock }) {
   const [toast, setToast] = React.useState('');
   const [busy, setBusy] = React.useState(false);
   const [errors, setErrors] = React.useState({});
+  const [editingId, setEditingId] = React.useState(null);
+  const [editingItem, setEditingItem] = React.useState(null); // original item being edited
 
   const set = (patch) => setDraft((d) => ({ ...d, ...patch }));
 
@@ -402,10 +428,44 @@ function Console({ onLock }) {
     set({ format: f, sourceMode: RD.FORMATS[f].source });
   };
 
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingItem(null);
+    setDraft(BLANK);
+    setFile(null);
+    setErrors({});
+  };
+
+  const loadForEdit = (item) => {
+    setEditingId(item.id);
+    setEditingItem(item);
+    setFile(null);
+    setErrors({});
+    setDraft({
+      format: item.format || 'PDF',
+      sourceMode: item.url ? 'url' : 'file',
+      title: item.title || '',
+      category: item.category || RD.CATEGORIES[0],
+      typeLabel: item.typeLabel || '',
+      tags: item.tags || [],
+      meta: item.meta || '',
+      date: item.date || '',
+      summary: item.summary || '',
+      url: item.url || '',
+      publisherName: item.publisherName || '',
+      publisherLogoMode: item.publisherLogo ? 'url' : 'none',
+      publisherLogoUrl: item.publisherLogo || '',
+      publisherLogoFile: null
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const validate = () => {
     const e = {};
     if (!draft.title.trim()) e.title = true;
-    if (draft.sourceMode === 'file' && !file) e.source = 'Attach a file.';
+    // When editing and sourceMode is 'file', existing fileData is fine — only require a new file when creating
+    const hasExistingFile = editingItem && editingItem.fileData;
+    if (draft.sourceMode === 'file' && !file && !hasExistingFile) e.source = 'Attach a file.';
     if (draft.sourceMode === 'url' && !draft.url.trim()) e.source = 'Enter a URL.';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -426,7 +486,10 @@ function Console({ onLock }) {
         summary: draft.summary,
         url: draft.sourceMode === 'url' ? draft.url : '',
         publisherName: draft.publisherName,
-        publisherLogo: draft.publisherLogoMode === 'url' ? draft.publisherLogoUrl : null
+        publisherLogo: draft.publisherLogoMode === 'url' ? draft.publisherLogoUrl : null,
+        // carry over existing file from the item being edited (unless a new file was chosen)
+        fileData: (editingItem && draft.sourceMode === 'file' && !file) ? editingItem.fileData : null,
+        fileName: (editingItem && draft.sourceMode === 'file' && !file) ? editingItem.fileName : null
       };
       if (draft.sourceMode === 'file' && file) {
         try {
@@ -443,24 +506,38 @@ function Console({ onLock }) {
           setToast('Could not read the publisher logo.'); setBusy(false); return;
         }
       }
-      const item = RD.makeItem(fields);
-      try {
-        await RD.add(item);
-      } catch (err) {
-        setToast('Storage is full — that file is too large for the local demo.');
-        setBusy(false); return;
+
+      if (editingId) {
+        try {
+          await RD.update(editingId, fields);
+        } catch (err) {
+          setToast('Could not save changes.'); setBusy(false); return;
+        }
+        setToast('Changes saved ✓');
+        cancelEdit();
+      } else {
+        const item = RD.makeItem(fields);
+        try {
+          await RD.add(item);
+        } catch (err) {
+          setToast('Storage is full — that file is too large for the local demo.');
+          setBusy(false); return;
+        }
+        setToast('Published to the Research Hub ✓');
+        setDraft({ ...BLANK, format: draft.format, sourceMode: draft.sourceMode, category: draft.category });
+        setFile(null);
+        set({ publisherLogoFile: null });
+        setErrors({});
       }
-      setToast('Published to the Research Hub ✓');
-      setDraft({ ...BLANK, format: draft.format, sourceMode: draft.sourceMode, category: draft.category });
-      setFile(null);
-      set({ publisherLogoFile: null });
-      setErrors({});
     } finally {
       setBusy(false);
     }
   };
 
-  const remove = (id) => { RD.remove(id); };
+  const remove = (id) => {
+    if (editingId === id) cancelEdit();
+    RD.remove(id);
+  };
 
   const fmt = RD.FORMATS[draft.format];
   const allowsFileToggle = true; // any format can use either a file or a URL
@@ -515,13 +592,18 @@ function Console({ onLock }) {
     ),
 
     React.createElement('main', { style: page },
-      React.createElement('div', { style: { marginBottom: 'var(--space-7)' } },
-        React.createElement('h1', {
-          style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h2)', color: 'var(--text-primary)', letterSpacing: 'var(--tracking-tight)', marginBottom: 'var(--space-2)' }
-        }, 'Publish to the Research Hub'),
-        React.createElement('p', {
-          style: { fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', maxWidth: 560, lineHeight: 'var(--leading-body)' }
-        }, 'Add a paper, summary, video, deck, or link. It goes live on the public hub the moment you publish.')
+      React.createElement('div', { style: { marginBottom: 'var(--space-7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' } },
+        React.createElement('div', null,
+          React.createElement('h1', {
+            style: { fontFamily: 'var(--font-display)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--fs-h2)', color: 'var(--text-primary)', letterSpacing: 'var(--tracking-tight)', marginBottom: 'var(--space-2)' }
+          }, editingId ? 'Edit Published Item' : 'Publish to the Research Hub'),
+          React.createElement('p', {
+            style: { fontFamily: 'var(--font-sans)', fontSize: 'var(--fs-body)', color: 'var(--text-secondary)', maxWidth: 560, lineHeight: 'var(--leading-body)' }
+          }, editingId
+            ? 'Make your changes below. Saving will update the card on the public hub immediately.'
+            : 'Add a paper, summary, video, deck, or link. It goes live on the public hub the moment you publish.')
+        ),
+        editingId ? React.createElement(Button, { variant: 'ghost', size: 'sm', onClick: cancelEdit }, 'Cancel edit') : null
       ),
 
       React.createElement('div', { style: grid },
@@ -554,7 +636,12 @@ function Console({ onLock }) {
               )
             ),
             draft.sourceMode === 'file'
-              ? React.createElement(Dropzone, { file, accepts: fmt.accepts, onFile: (f) => { setFile(f); setErrors((e) => ({ ...e, source: undefined })); } })
+              ? React.createElement('div', null,
+                  editingItem && editingItem.fileData && !file
+                    ? React.createElement('p', { style: { ...cs.hint, marginBottom: 8, color: 'var(--text-secondary)' } }, '📎 Existing file kept. Drop a new file below to replace it.')
+                    : null,
+                  React.createElement(Dropzone, { file, accepts: fmt.accepts, onFile: (f) => { setFile(f); setErrors((e) => ({ ...e, source: undefined })); } })
+                )
               : React.createElement('div', null,
                   React.createElement('input', {
                     type: 'url', className: 'oc-field', placeholder: draft.format === 'Video' ? 'https://youtube.com/watch?v=…' : 'https://…',
@@ -677,9 +764,11 @@ function Console({ onLock }) {
           /* Submit */
           React.createElement('div', { style: { marginTop: 'var(--space-6)', display: 'flex', gap: 'var(--space-3)' } },
             React.createElement(Button, { variant: 'primary', size: 'lg', onClick: publish, disabled: busy },
-              busy ? 'Publishing…' : 'Publish to hub'
+              busy ? (editingId ? 'Saving…' : 'Publishing…') : (editingId ? 'Save changes' : 'Publish to hub')
             ),
-            React.createElement(Button, { variant: 'ghost', size: 'lg', onClick: () => { setDraft(BLANK); setFile(null); setErrors({}); } }, 'Reset')
+            React.createElement(Button, { variant: 'ghost', size: 'lg', onClick: editingId ? cancelEdit : () => { setDraft(BLANK); setFile(null); setErrors({}); } },
+              editingId ? 'Cancel' : 'Reset'
+            )
           )
         ),
 
@@ -696,7 +785,7 @@ function Console({ onLock }) {
               React.createElement('span', null, 'Published'),
               React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, items.length + ' item' + (items.length === 1 ? '' : 's'))
             ),
-            React.createElement(PublishedList, { items, onDelete: remove })
+            React.createElement(PublishedList, { items, onDelete: remove, onEdit: loadForEdit, editingId })
           )
         )
       )
